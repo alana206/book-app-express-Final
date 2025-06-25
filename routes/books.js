@@ -1,45 +1,66 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+require('dotenv').config();
 
-const collectionName = 'books'; 
+const upload = multer({
+  dest: path.join(__dirname, '../public/uploads/'),
+  limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
+});
 
+// GET all books
 router.get('/', async (req, res, next) => {
   try {
-    const allBooks = await req.db.collection(collectionName).find({}).toArray();
+    const allBooks = await req.models.Book.find({});
     res.render('all-books', { title: 'All Books', books: allBooks });
   } catch (err) {
     next(err); 
   }
 });
 
+// GET add book form
 router.get('/add', (req, res, next) => {
   res.render('new-book', { title: 'Add New Book' });
 });
 
-router.post('/add', async (req, res, next) => {
+// POST add new book
+router.post('/add', upload.single('coverImage'), async (req, res, next) => {
   const newBook = req.body;
   if (!newBook.isbn || !newBook.title || !newBook.author) {
     return res.status(400).render('error', { message: 'ISBN, Title, and Author are required.', title: 'Error' });
   }
 
+  // If a file was uploaded, save its path
+  if (req.file) {
+    newBook.coverImage = '/uploads/' + req.file.filename;
+  }
+
   try {
-    const existingBook = await req.db.collection(collectionName).findOne({ isbn: newBook.isbn });
+    // Make sure isbn is a string for consistent querying
+    const isbnStr = String(newBook.isbn);
+
+    // Check for existing book by ISBN
+    const existingBook = await req.models.Book.findOne({ isbn: isbnStr });
     if (existingBook) {
       return res.status(409).render('error', { message: 'A book with this ISBN already exists.', title: 'Error' });
     }
 
-    await req.db.collection(collectionName).insertOne(newBook);
+    newBook.isbn = isbnStr; // Ensure isbn is stored as string
+
+    // Create new book
+    await req.models.Book.create(newBook);
     res.redirect('/books');
   } catch (err) {
     next(err);
   }
 });
 
-
+// GET edit book form
 router.get('/edit/:isbn', async (req, res, next) => {
-  const isbn = req.params.isbn;
+  const isbn = String(req.params.isbn);
   try {
-    const book = await req.db.collection(collectionName).findOne({ isbn: isbn });
+    const book = await req.models.Book.findOne({ isbn: isbn });
     if (book) {
       res.render('edit-book-detail', { title: `Edit Book: ${book.title}`, book: book });
     } else {
@@ -50,9 +71,9 @@ router.get('/edit/:isbn', async (req, res, next) => {
   }
 });
 
-// POST to update an existing book (UPDATE - handle submission) - /books/edit/:isbn
+// POST update book
 router.post('/edit/:isbn', async (req, res, next) => {
-  const isbn = req.params.isbn;
+  const isbn = String(req.params.isbn);
   const updatedBookData = req.body;
   delete updatedBookData.isbn; // Prevent ISBN from being updated
 
@@ -61,11 +82,11 @@ router.post('/edit/:isbn', async (req, res, next) => {
   }
 
   try {
-    const result = await req.db.collection(collectionName).updateOne(
+    const result = await req.models.Book.updateOne(
       { isbn: isbn },
       { $set: updatedBookData }
     );
-    if (result.matchedCount === 0) {
+    if (result.matchedCount === 0 && result.n === 0) {
       return res.status(404).render('error', { message: 'Book not found for updating.', title: 'Error' });
     }
     res.redirect(`/books/${isbn}`);
@@ -74,10 +95,11 @@ router.post('/edit/:isbn', async (req, res, next) => {
   }
 });
 
+// POST delete book
 router.post('/delete/:isbn', async (req, res, next) => {
-  const isbn = req.params.isbn;
+  const isbn = String(req.params.isbn);
   try {
-    const result = await req.db.collection(collectionName).deleteOne({ isbn: isbn });
+    const result = await req.models.Book.deleteOne({ isbn: isbn });
     if (result.deletedCount === 0) {
       return res.status(404).render('error', { message: 'Book not found for deletion.', title: 'Error' });
     }
@@ -87,11 +109,11 @@ router.post('/delete/:isbn', async (req, res, next) => {
   }
 });
 
-// GET a single book by ISBN (READ) - /books/:isbn
+// GET single book by ISBN
 router.get('/:isbn', async (req, res, next) => {
-  const isbn = req.params.isbn;
+  const isbn = String(req.params.isbn);
   try {
-    const book = await req.db.collection(collectionName).findOne({ isbn: isbn });
+    const book = await req.models.Book.findOne({ isbn: isbn });
     if (book) {
       res.render('view-book', { title: book.title, book: book });
     } else {

@@ -3,47 +3,28 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
-const booksRouter = require("./routes/books.js"); //
+const booksRouter = require("./routes/books.js");
 
 const app = express();
 
-// MongoDB Connection Setup
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
-const dbName = "bookapp";
-const collectionName = "books";
-let db;
+const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/bookapp";
 
-async function connectToMongo() {
-  try {
-    const client = new MongoClient(uri);
-    await client.connect();
-    console.log("Connected to MongoDB");
-    db = client.db(dbName);
-
-    const { books } = require("./data/books");
-    const collection = db.collection(collectionName);
-    const count = await collection.countDocuments();
-    if (count === 0) {
-      await collection.insertMany(books);
-      console.log("Initial book data inserted into MongoDB.");
-    }
-  } catch (err) {
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connected to MongoDB with Mongoose"))
+  .catch(err => {
     console.error("Failed to connect to MongoDB", err);
     process.exit(1);
-  }
-}
-connectToMongo();
+  });
 
+// Make Mongoose models available in req
 app.use((req, res, next) => {
-  if (!db) {
-    // Database not ready yet
-    return res.status(503).render('error', { message: 'Database not connected. Please try again later.', title: 'Error' });
-  }
-  req.db = db;
+  req.models = {
+    Book: require("./models/Books")
+  };
   next();
 });
 
