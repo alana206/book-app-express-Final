@@ -11,7 +11,8 @@ block content
           a(href='/books/' + book.isbn)= book.title
           br
           span by #{book.author}
-          .actions
+            br
+            span
             a(href='/books/edit/' + book.isbn, class='button') Edit
-            form(action='/books/delete/' + book.isbn, method='POST', onsubmit='return confirm("Are you sure you want to delete this book?");', class='inline-form')
-              button(type='submit', class='button') Delete
+            form(action='/books/delete/' + book.isbn, method='POST', onsubmit='return confirm("Are you sure you want to delete this book?");')
+              button(type='submit', class='delete-button') Delete

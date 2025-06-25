@@ -1,36 +1,41 @@
 extends layout.pug
 
 block content
-  h1= title
-  form(action='/books/add', method='POST', enctype='multipart/form-data')
-    .form-group
-      label(for='isbn') ISBN:
-      input(type='text', id='isbn', name='isbn', required)
-    .form-group
-      label(for='title') Title:
-      input(type='text', id='title', name='title', required)
-    .form-group
-      label(for='author') Author:
-      input(type='text', id='author', name='author', required)
-    .form-group
-      label(for='subtitle') Subtitle:
-      input(type='text', id='subtitle', name='subtitle')
-    .form-group
-      label(for='published') Published Date:
-      input(type='date', id='published', name='published')
-    .form-group
-      label(for='publisher') Publisher:
-      input(type='text', id='publisher', name='publisher')
-    .form-group
-      label(for='pages') Pages:
-      input(type='number', id='pages', name='pages')
-    .form-group
-      label(for='description') Description:
-      textarea(id='description', name='description', rows='5')
-    .form-group
-      label(for='website') Website:
-      input(type='url', id='website', name='website')
-    .form-group
-      label(for='coverImage') Upload Cover Image:
-      input(type='file', id='coverImage', name='coverImage', accept='image/*')
-    button(type='submit', class='button') Add Book
+  .block-content-wrapper
+    form(action='/books/edit/' + book.isbn, method='POST', enctype='multipart/form-data')
+      .form-group
+        label(for='isbn') ISBN (Read-only):
+        input(type='text', id='isbn', name='isbn', value=book.isbn, readonly)
+      .form-group
+        label(for='title') Title:
+        input(type='text', id='title', name='title', value=book.title, required)
+      .form-group
+        label(for='author') Author:
+        input(type='text', id='author', name='author', value=book.author, required)
+      .form-group
+        label(for='subtitle') Subtitle:
+        input(type='text', id='subtitle', name='subtitle', value=book.subtitle)
+      .form-group
+        label(for='published') Published Date:
+        input(type='date', id='published', name='published', value=book.published)
+      .form-group
+        label(for='publisher') Publisher:
+        input(type='text', id='publisher', name='publisher', value=book.publisher)
+      .form-group
+        label(for='pages') Pages:
+        input(type='number', id='pages', name='pages', value=book.pages)
+      .form-group
+        label(for='description') Description:
+        textarea(id='description', name='description', rows='4')= book.description
+      .form-group
+        label(for='website') Website:
+        input(type='url', id='website', name='website', value=book.website)
+      .form-group
+        label(for='coverImage') Cover Image URL:
+        input(type='url', id='coverImage', name='coverImage', value=book.coverImage)
+      .form-group
+        label(for='coverImageUpload') Or Upload New Cover Image:
+        input(type='file', id='coverImageUpload', name='coverImageUpload', accept='image/*')
+      .button
+        button(type='submit', class='button') Save Changes
+        a.button(href='/books/' + book.isbn) Cancel
