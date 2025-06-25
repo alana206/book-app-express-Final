@@ -12,7 +12,6 @@ const booksRouter = require("./routes/books.js");
 const app = express();
 
 const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/bookapp";
-
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB with Mongoose"))
   .catch(err => {
@@ -20,11 +19,10 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     process.exit(1);
   });
 
-// Make Mongoose models available in req
+const Book = require('./models/Books');
+// Attach models to req
 app.use((req, res, next) => {
-  req.models = {
-    Book: require("./models/Books")
-  };
+  req.models = { Book };
   next();
 });
 

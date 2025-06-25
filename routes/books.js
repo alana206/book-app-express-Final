@@ -86,7 +86,11 @@ router.post('/edit/:isbn', async (req, res, next) => {
       { isbn: isbn },
       { $set: updatedBookData }
     );
-    if (result.matchedCount === 0 && result.n === 0) {
+    // BUG FIX: Check for both possible result properties for compatibility
+    if (
+      (typeof result.matchedCount !== 'undefined' && result.matchedCount === 0) ||
+      (typeof result.n !== 'undefined' && result.n === 0)
+    ) {
       return res.status(404).render('error', { message: 'Book not found for updating.', title: 'Error' });
     }
     res.redirect(`/books/${isbn}`);

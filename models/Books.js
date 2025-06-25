@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const bookSchema = new Schema({
-  isbn: Number,
+  isbn: String,
   title: String,
   subtitle: String,
   author: String,
@@ -11,16 +11,7 @@ const bookSchema = new Schema({
   pages: Number,
   description: String,
   website: String,
+  coverImage: String
 });
 
 module.exports = mongoose.model('Book', bookSchema);
-
-router.get('/', async (req, res, next) => {
-  try {
-    const allBooks = await req.models.Book.find({});
-    res.render('all-books', { title: 'All Books', books: allBooks });
-  } catch (err) {
-    next(err); 
-  }
-});
-// ...and similarly update other CRUD operations to use req.models.Book...
