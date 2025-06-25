@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title= title ? `Book App | ${title}` : 'Book App'
+    link(rel='stylesheet', href='/stylesheets/style.css') 
+    // Add custom CSS link if you create one in public/css
+    // link(rel='stylesheet', href='/css/custom.css')
+  body
+    nav.navbar
+      a(href='/books') Home
+      a(href='/books/add') Add Book
+    .container
+      block content

@@ -1,0 +1,38 @@
+extends layout.pug
+
+block content
+  h1= title
+  form(action='/books/add', method='POST')
+    .form-group
+      label(for='isbn') ISBN:
+      input(type='text', id='isbn', name='isbn', required)
+    .form-group
+      label(for='title') Title:
+      input(type='text', id='title', name='title', required)
+    .form-group
+      label(for='author') Author:
+      input(type='text', id='author', name='author', required)
+    .form-group
+      label(for='subtitle') Subtitle:
+      input(type='text', id='subtitle', name='subtitle')
+    .form-group
+      label(for='published') Published Date:
+      input(type='date', id='published', name='published')
+    .form-group
+      label(for='publisher') Publisher:
+      input(type='text', id='publisher', name='publisher')
+    .form-group
+      label(for='pages') Pages:
+      input(type='number', id='pages', name='pages')
+    .form-group
+      label(for='description') Description:
+      textarea(id='description', name='description', rows='5')
+    .form-group
+      label(for='website') Website:
+      input(type='url', id='website', name='website')
+    .form-group
+      label(for='coverImage') Cover Image URL:
+      input(type='url', id='coverImage', name='coverImage')
+    button(type='submit', class='button') Add Book
+    p
+      a(href='/books') Cancel

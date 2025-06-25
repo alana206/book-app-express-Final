@@ -1,0 +1,17 @@
+extends layout.pug
+
+block content
+  h1= title
+  ul.book-list
+    each book in books
+      li
+        if book.coverImage
+          img.book-cover(src=book.coverImage, alt='Book Cover')
+        div.book-info
+          a(href='/books/' + book.isbn)= book.title
+          br
+          span by #{book.author}
+          .actions
+            a(href='/books/edit/' + book.isbn, class='button') Edit
+            form(action='/books/delete/' + book.isbn, method='POST', onsubmit='return confirm("Are you sure you want to delete this book?");', class='inline-form')
+              button(type='submit', class='button') Delete

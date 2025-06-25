@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1= message
+  h2= (typeof error !== 'undefined' && error.status) ? error.status : (status || '')
+  if error && error.stack
+    pre #{error.stack}

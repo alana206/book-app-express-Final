@@ -1,0 +1,39 @@
+extends layout.pug
+
+block content
+  .book-detail-container
+    h1= book.title
+    if book.coverImage
+      img.book-cover(src=book.coverImage, alt='Book Cover')
+    p
+      strong ISBN:
+      | #{book.isbn}
+    p
+      strong Author:
+      | #{book.author}
+    if book.subtitle
+      p
+        strong Subtitle:
+        | #{book.subtitle}
+    p
+      strong Published:
+      | #{book.published}
+    p
+      strong Publisher:
+      | #{book.publisher}
+    p
+      strong Pages:
+      | #{book.pages}
+    p
+      strong Description:
+      | #{book.description}
+    if book.website
+      p
+        strong Website:
+        a(href=book.website, target='_blank')= book.website
+    .actions
+      a(href='/books/edit/' + book.isbn, class='button') Edit Book
+      form(action='/books/delete/' + book.isbn, method='POST', onsubmit='return confirm("Are you sure you want to delete this book?");', class='inline-form')
+        button(type='submit', class='button') Delete Book
+    p.back-link
+      a(href='/') Back to all books
